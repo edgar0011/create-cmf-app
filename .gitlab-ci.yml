@@ -1,0 +1,31 @@
+stages:
+  - prebuild
+  - lint
+  - deploy
+
+download-dependencies:
+  image: node:18-alpine
+  stage: prebuild
+  script:
+    - npm ci
+  artifacts:
+    paths:
+      - node_modules
+
+es-lint:
+  image: node:18-alpine
+  stage: lint
+  dependencies:
+    - download-dependencies
+  script:
+    - npm run lint
+
+publish-library:
+  image: node:18-alpine
+  stage: deploy
+  script:
+    - env
+    - echo "//${CI_SERVER_HOST}/api/v4/projects/${NPM_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}">.npmrc
+    - npm publish --verbose
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"

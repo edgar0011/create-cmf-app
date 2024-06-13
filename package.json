@@ -1,0 +1,32 @@
+{
+  "name": "@e1011/create-cmf-app",
+  "version": "1.0.23",
+  "description": "npm init, yarn init, template ",
+  "main": "index.js",
+  "author": "martin.weiser@gmail.com",
+  "license": "MIT",
+  "bin": {
+    "create-cmf-app": "cli/create-cmf-app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edgar0011/create-cmf-app"
+  },
+  "scripts": {
+    "lint": "eslint cli",
+    "lint:ts": "eslint cli --ext js,jsx,ts,tsx",
+    "lint:quiet": "eslint cli --quiet",
+    "lint:ts:quiet": "eslint cli --ext js,jsx,ts,tsx --quiet",
+    "lint:fix": "yarn lint --fix",
+    "cli:test": "node ./cli/create-cmf-app.js"
+  },
+  "dependencies": {
+    "chalk-pipe": "^4.0.0",
+    "glob": "^10.4.1",
+    "inquirer": "^8.2.0",
+    "shelljs": "^0.8.5"
+  },
+  "devDependencies": {
+    "@earlorg/eslint-config": "^1.5.74"
+  }
+}

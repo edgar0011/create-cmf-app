@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "@earlorg/eslint-config/base",
+    "@earlorg/eslint-config/base-react-jsx",
+    "@earlorg/eslint-config/base-typescript",
+    "@earlorg/eslint-config/perf-react-jsx",
+    "@earlorg/eslint-config/app-common",
+    "plugin:import/typescript"
+  ],
+  "rules": {
+    "@typescript-eslint/explicit-function-return-type": "warn",
+    "@typescript-eslint/no-explicit-any": "warn"
+  }
+}
