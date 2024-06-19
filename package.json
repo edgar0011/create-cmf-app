@@ -1,6 +1,6 @@
 {
   "name": "@e1011/create-cmf-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "npm init, yarn init, template ",
   "main": "index.js",
   "author": "martin.weiser@gmail.com",
