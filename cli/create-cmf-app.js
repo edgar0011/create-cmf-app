@@ -3,13 +3,14 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs')
-
-const fsPromises = fs.promises
+const childProcess = require('node:child_process')
 
 const inquirer = require('inquirer')
 const shell = require('shelljs')
 const chalkPipe = require('chalk-pipe')
 const { glob } = require('glob')
+
+const fsPromises = fs.promises
 
 const pckg = require('../package.json')
 
@@ -50,6 +51,16 @@ console.log('')
 
 const prompts = [
   {
+    type: 'list',
+    message: () => chalkPipe('green.bold')('Type of app:'),
+    name: 'appType',
+    choices: ['cmf', 'coreVite', 'Run Core Vite'],
+    default: 'cmf',
+    transformer(text) {
+      return chalkPipe('blue.bold')(text)
+    },
+  },
+  {
     type: 'input',
     message: () => chalkPipe('green.bold')('Target folder / application name:'),
     name: 'folderName',
@@ -70,16 +81,6 @@ const prompts = [
   },
   {
     type: 'list',
-    message: () => chalkPipe('green.bold')('Type of app:'),
-    name: 'appType',
-    choices: ['cmf', 'coreVite'],
-    default: 'cmf',
-    transformer(text) {
-      return chalkPipe('blue.bold')(text)
-    },
-  },
-  {
-    type: 'list',
     message: () => chalkPipe('green.bold')('Type of template:'),
     name: 'templateType',
     choices: ['medium', 'simple'],
@@ -91,7 +92,7 @@ const prompts = [
 ]
 
 if (folderSet) {
-  prompts.shift()
+  prompts.splice(1, 1)
 }
 
 (async function () {
@@ -105,9 +106,15 @@ if (folderSet) {
     fs.mkdirSync(folderName)
   }
 
+  if (answers.appType === 'Run Core Vite') {
+    childProcess.fork('./cli/core-vite-executor.js', [process.argv[2] || ''])
+    process.exit()
+  }
+
   if (answers.appType === 'coreVite') {
     gitRepo = GIT_REPO_CORE_VITE
   }
+
   if (answers.appType === 'cmf') {
     gitRepo = GIT_REPO_CMF
   }
