@@ -49,12 +49,18 @@ console.log(chalkPipe('blue').underline(`
 console.log(chalkPipe('blue').underline(`Create CMF app, v${pckg.version}`))
 console.log('')
 
+const appNames = {
+  CMF: 'cmf',
+  CORE_VITE: 'coreVite',
+  RUN_CORE_VITE: 'Run Core Vite',
+}
+
 const prompts = [
   {
     type: 'list',
     message: () => chalkPipe('green.bold')('Type of app:'),
     name: 'appType',
-    choices: ['cmf', 'coreVite', 'Run Core Vite'],
+    choices: Object.values(appNames),
     default: 'cmf',
     transformer(text) {
       return chalkPipe('blue.bold')(text)
@@ -68,6 +74,7 @@ const prompts = [
     transformer(text) {
       return chalkPipe('blue.bold')(text)
     },
+    when: (answers) => answers.appType !== appNames.RUN_CORE_VITE,
   },
   {
     type: 'list',
@@ -78,6 +85,7 @@ const prompts = [
     transformer(text) {
       return chalkPipe('blue.bold')(text)
     },
+    when: (answers) => answers.appType !== appNames.RUN_CORE_VITE,
   },
   {
     type: 'list',
@@ -88,6 +96,7 @@ const prompts = [
     transformer(text) {
       return chalkPipe('blue.bold')(text)
     },
+    when: (answers) => answers.appType !== appNames.RUN_CORE_VITE,
   },
 ]
 
@@ -106,16 +115,16 @@ if (folderSet) {
     fs.mkdirSync(folderName)
   }
 
-  if (answers.appType === 'Run Core Vite') {
+  if (answers.appType === appNames.RUN_CORE_VITE) {
     childProcess.fork('./cli/core-vite-executor.js', [process.argv[2] || ''])
     process.exit()
   }
 
-  if (answers.appType === 'coreVite') {
+  if (answers.appType === appNames.CORE_VITE) {
     gitRepo = GIT_REPO_CORE_VITE
   }
 
-  if (answers.appType === 'cmf') {
+  if (answers.appType === appNames.CMF) {
     gitRepo = GIT_REPO_CMF
   }
 
@@ -126,27 +135,33 @@ if (folderSet) {
   let pkg = await fsPromises.readFile(packageJSONFile, 'utf8')
   let readme = await fsPromises.readFile(readmeFile, 'utf8')
   let husky = await fsPromises.readFile(huskyFile, 'utf8')
-  const templateConfig = JSON.parse(await fsPromises.readFile(templateConfigFile, 'utf8'))
 
-  const removeFiles = await glob(templateConfig[answers.templateType].remove)
-  const replace = templateConfig[answers.templateType]?.replace
+  if (fs.existsSync(templateConfigFile)) {
+    const templateConfig = JSON.parse(await fsPromises.readFile(templateConfigFile, 'utf8'))
 
-  console.log('Removing files...')
-  // eslint-disable-next-line no-restricted-syntax
-  for (const file of removeFiles) {
-    shell.exec(`rm -rf ${file}`)
-  }
+    const removeFiles = await glob(templateConfig[answers.templateType].remove)
+    const replace = templateConfig[answers.templateType]?.replace
 
-  if (replace) {
-    console.log('Replacing files...')
-    for (const file of replace) {
-      const [source, target] = Object.entries(file)[0]
+    console.log('Removing files...')
+    // eslint-disable-next-line no-restricted-syntax
+    for (const file of removeFiles) {
+      shell.exec(`rm -rf ${file}`)
+    }
 
-      if (fs.existsSync(target)) {
-        await fsPromises.rename(target, source)
+    if (replace) {
+      console.log('Replacing files...')
+      for (const file of replace) {
+        const [source, target] = Object.entries(file)[0]
+
+        if (fs.existsSync(target)) {
+          await fsPromises.rename(target, source)
+        }
       }
     }
+    await fsPromises.unlink(templateConfigFile)
   }
+
+
 
   pkg = pckReplacer(pkg, folderName)
   readme = readmeReplacer(readme, folderName)
@@ -161,7 +176,7 @@ if (folderSet) {
   await fsPromises.writeFile(readmeFile, readme)
   await fsPromises.writeFile(huskyFile, husky)
 
-  await fsPromises.unlink(templateConfigFile)
+
 
   shell.exec(`${answers.installer} install`, { silent: false }, function(code, stdout, stderr) {
     if (stderr) {
