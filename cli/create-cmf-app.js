@@ -140,7 +140,7 @@ if (folderSet) {
     const templateConfig = JSON.parse(await fsPromises.readFile(templateConfigFile, 'utf8'))
 
     const removeFiles = await glob(templateConfig[answers.templateType].remove)
-    const replace = templateConfig[answers.templateType]?.replace
+    const replaceFiles = templateConfig[answers.templateType]?.replace
 
     console.log('Removing files...')
     // eslint-disable-next-line no-restricted-syntax
@@ -148,9 +148,9 @@ if (folderSet) {
       shell.exec(`rm -rf ${file}`)
     }
 
-    if (replace) {
+    if (replaceFiles) {
       console.log('Replacing files...')
-      for (const file of replace) {
+      for (const file of replaceFiles) {
         const [source, target] = Object.entries(file)[0]
 
         if (fs.existsSync(target)) {
@@ -160,8 +160,6 @@ if (folderSet) {
     }
     await fsPromises.unlink(templateConfigFile)
   }
-
-
 
   pkg = pckReplacer(pkg, folderName)
   readme = readmeReplacer(readme, folderName)

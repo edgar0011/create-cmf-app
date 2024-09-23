@@ -1,10 +1,10 @@
 {
   "extends": [
-    "@earlorg/eslint-config/base",
-    "@earlorg/eslint-config/base-react-jsx",
-    "@earlorg/eslint-config/base-typescript",
-    "@earlorg/eslint-config/perf-react-jsx",
-    "@earlorg/eslint-config/app-common",
+    "@e1011/eslint-config/base",
+    "@e1011/eslint-config/base-react-jsx",
+    "@e1011/eslint-config/base-typescript",
+    "@e1011/eslint-config/perf-react-jsx",
+    "@e1011/eslint-config/app-common",
     "plugin:import/typescript"
   ],
   "rules": {
